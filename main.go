@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 
+	"github.com/kw510/protoc-gen-go-mock/internal/testify"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/pluginpb"
 )
@@ -18,13 +19,25 @@ func main() {
 		return
 	}
 
-	protogen.Options{}.Run(func(gen *protogen.Plugin) error {
+	var flags flag.FlagSet
+	framework := flags.String("framework", "", "set the framework")
+
+	protogen.Options{
+		ParamFunc: flags.Set,
+	}.Run(func(gen *protogen.Plugin) error {
 		gen.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
+		var fn func(*protogen.Plugin, *protogen.File, string) *protogen.GeneratedFile
+		switch *framework {
+		case "testify":
+			fn = testify.GenerateFile
+		default:
+			fn = testify.GenerateFile
+		}
 		for _, f := range gen.Files {
 			if !f.Generate {
 				continue
 			}
-			generateFile(gen, f)
+			fn(gen, f, version)
 		}
 		return nil
 	})
