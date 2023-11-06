@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 
+	"github.com/kw510/protoc-gen-go-mock/internal/handlers"
 	"github.com/kw510/protoc-gen-go-mock/internal/testify"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/pluginpb"
@@ -30,6 +31,8 @@ func main() {
 		switch *framework {
 		case "testify":
 			fn = testify.GenerateFile
+		case "handlers":
+			fn = handlers.GenerateFile
 		default:
 			fn = testify.GenerateFile
 		}
