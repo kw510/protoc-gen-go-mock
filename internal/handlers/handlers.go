@@ -69,14 +69,31 @@ func genService(gen *protogen.Plugin, file *protogen.File, g *protogen.Generated
 
 func genClientMethod(gen *protogen.Plugin, file *protogen.File, g *protogen.GeneratedFile, method *protogen.Method) {
 	service := method.Parent
-	// fmSymbol := "helper.formatFullMethodSymbol(service, method)"
 	g.P("func (c *", service.GoName, "MockClient) ", clientSignature(g, method), "{")
+	// Unary
+	if !method.Desc.IsStreamingServer() && !method.Desc.IsStreamingClient() {
+		g.P("handler := c.", service.GoName, method.GoName, "Handler")
+		g.P("if handler == nil {")
+		g.P("return nil, ", g.QualifiedGoIdent(fmtPackage.Ident("Errorf")), "(\"no handler registered\")")
+		g.P("}")
+		g.P()
+		g.P("return handler(ctx, in, opts)")
+		g.P("}")
+		g.P()
+		return
+	}
+
 	g.P("handler := c.", service.GoName, method.GoName, "Handler")
 	g.P("if handler == nil {")
 	g.P("return nil, ", g.QualifiedGoIdent(fmtPackage.Ident("Errorf")), "(\"no handler registered\")")
 	g.P("}")
 	g.P()
-	g.P("return handler(ctx, in, opts)")
+	s := "return handler(ctx"
+	if !method.Desc.IsStreamingClient() {
+		s += ", in"
+	}
+	s += ", opts)"
+	g.P(s)
 	g.P("}")
 	g.P()
 }
