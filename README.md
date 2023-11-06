@@ -1,4 +1,6 @@
 # protoc-gen-go-mock
+[![Go Reference](https://pkg.go.dev/badge/github.com/kw510/protoc-gen-go-mock.svg)](https://pkg.go.dev/github.com/kw510/protoc-gen-go-mock)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kw510/protoc-gen-go-mock)](https://goreportcard.com/report/github.com/kw510/protoc-gen-go-mock)
 
 This tool generates Go language bindings of services in protobuf definition files for mocking gRPC.
 
