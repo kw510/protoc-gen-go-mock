@@ -10,7 +10,7 @@ import (
 	"google.golang.org/protobuf/types/pluginpb"
 )
 
-const version = "0.2.2"
+const version = "0.2.3"
 
 func main() {
 	showVersion := flag.Bool("version", false, "print the version and exit")
@@ -34,7 +34,7 @@ func main() {
 		case "handlers":
 			fn = handlers.GenerateFile
 		default:
-			fn = testify.GenerateFile
+			fn = handlers.GenerateFile
 		}
 		for _, f := range gen.Files {
 			if !f.Generate {
