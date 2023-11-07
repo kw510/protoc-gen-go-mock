@@ -51,7 +51,7 @@ func genService(gen *protogen.Plugin, file *protogen.File, g *protogen.Generated
 	clientName := service.GoName + "MockClient"
 	g.P("type ", clientName, " struct {")
 	for _, method := range service.Methods {
-		g.P(method.GoName, "Handler")
+		g.P(service.GoName, method.GoName, "Handler")
 	}
 	g.P("}")
 	g.P()
