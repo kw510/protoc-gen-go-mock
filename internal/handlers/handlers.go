@@ -77,7 +77,7 @@ func genClientMethod(gen *protogen.Plugin, file *protogen.File, g *protogen.Gene
 		g.P("return nil, ", g.QualifiedGoIdent(fmtPackage.Ident("Errorf")), "(\"no handler registered\")")
 		g.P("}")
 		g.P()
-		g.P("return handler(ctx, in, opts)")
+		g.P("return handler(ctx, in, opts...)")
 		g.P("}")
 		g.P()
 		return
@@ -92,7 +92,7 @@ func genClientMethod(gen *protogen.Plugin, file *protogen.File, g *protogen.Gene
 	if !method.Desc.IsStreamingClient() {
 		s += ", in"
 	}
-	s += ", opts)"
+	s += ", opts...)"
 	g.P(s)
 	g.P("}")
 	g.P()
