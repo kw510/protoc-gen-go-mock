@@ -43,17 +43,21 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 }
 
 func genService(gen *protogen.Plugin, file *protogen.File, g *protogen.GeneratedFile, service *protogen.Service) {
-	for _, method := range service.Methods {
-		g.P("type ", service.GoName, method.GoName, "Handler func ", methodSignature(g, method))
-		g.P()
-	}
-
 	clientName := service.GoName + "MockClient"
+
+	// Check if implements interface
+	g.P("var _ ", service.GoName, "Client", "=&", clientName, "{}")
+
 	g.P("type ", clientName, " struct {")
 	for _, method := range service.Methods {
 		g.P(service.GoName, method.GoName, "Handler")
 	}
 	g.P("}")
+	g.P()
+
+	for _, method := range service.Methods {
+		g.P("type ", service.GoName, method.GoName, "Handler func ", methodSignature(g, method))
+	}
 	g.P()
 
 	g.P("func New", clientName, " () *", service.GoName, "MockClient {")
@@ -69,12 +73,13 @@ func genService(gen *protogen.Plugin, file *protogen.File, g *protogen.Generated
 
 func genClientMethod(gen *protogen.Plugin, file *protogen.File, g *protogen.GeneratedFile, method *protogen.Method) {
 	service := method.Parent
+	name := fmt.Sprint(service.GoName, method.GoName, "Handler")
 	g.P("func (c *", service.GoName, "MockClient) ", clientSignature(g, method), "{")
 	// Unary
 	if !method.Desc.IsStreamingServer() && !method.Desc.IsStreamingClient() {
-		g.P("handler := c.", service.GoName, method.GoName, "Handler")
+		g.P("handler := c.", name)
 		g.P("if handler == nil {")
-		g.P("return nil, ", g.QualifiedGoIdent(fmtPackage.Ident("Errorf")), "(\"no handler registered\")")
+		g.P("return nil, ", g.QualifiedGoIdent(fmtPackage.Ident("Errorf")), "(\"no handler registered for ", method.GoName, "\")")
 		g.P("}")
 		g.P()
 		g.P("return handler(ctx, in, opts...)")
@@ -85,7 +90,7 @@ func genClientMethod(gen *protogen.Plugin, file *protogen.File, g *protogen.Gene
 
 	g.P("handler := c.", service.GoName, method.GoName, "Handler")
 	g.P("if handler == nil {")
-	g.P("return nil, ", g.QualifiedGoIdent(fmtPackage.Ident("Errorf")), "(\"no handler registered\")")
+	g.P("return nil, ", g.QualifiedGoIdent(fmtPackage.Ident("Errorf")), "(\"no handler registered for ", method.GoName, "\")")
 	g.P("}")
 	g.P()
 	s := "return handler(ctx"
