@@ -22,9 +22,10 @@ Also required:
 ```shell
 go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-protoc --go_out=. \
-       --go-mock_out=. --go-mock_opt=framework=testify \
-       petstore.proto
+protoc --go_out=.examples \
+       --go-grpc_out=.examples \
+       --go-mock_out=.examples \
+       .examples/petstore.proto
 ```
 
 ## Building locally
